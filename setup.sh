@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-step setup for biofile-mcp:
 #   1. create (or update) the "biofile" conda environment
-#   2. make test files and check every tool works
+#   2. make test files and run the test suite
 #   3. connect the server to Claude Code
 #
 # Usage:
@@ -45,12 +45,9 @@ echo ">> Using Python: $ENV_PYTHON"
 echo ">> Making test files"
 python make_test_data.py
 
-echo ">> Checking each tool"
-python main.py test_data/test.vcf > /dev/null
-python main.py test_data/test.bam --region chr1:1001-1100 > /dev/null
-python main.py test_data/small.h5ad --column cell_type > /dev/null
-python main.py test_data/sample_R1.fastq --max-reads 100 > /dev/null
-echo "   all 4 tools work"
+echo ">> Running the test suite"
+python -m pytest -q
+echo "   all tests passed"
 
 # ---- 4. Connect to Claude Code -------------------------------------------
 mkdir -p "$DATA_DIR"
