@@ -72,6 +72,27 @@ def test_refused_calls_are_logged_as_warnings(allowed, caplog):
     assert any(r.levelname == "WARNING" and "refused vcf_stats" in r.getMessage() for r in caplog.records)
 
 
+def test_invalid_arguments_are_logged_without_traceback(allowed, caplog):
+    tool = server.only_allowed_folder(server.h5ad_summary)
+    with caplog.at_level(logging.INFO, logger="biofile"), pytest.raises(ToolError):
+        tool("small.h5ad", column="nope")
+    rejected = [r for r in caplog.records if "rejected h5ad_summary" in r.getMessage()]
+    assert len(rejected) == 1
+    assert rejected[0].levelname == "WARNING"
+    assert rejected[0].exc_info is None
+
+
+def test_unexpected_errors_are_logged_with_traceback(allowed, caplog):
+    def broken(path):
+        raise RuntimeError("disk on fire")
+
+    tool = server.only_allowed_folder(broken)
+    with caplog.at_level(logging.INFO, logger="biofile"), pytest.raises(ToolError, match="RuntimeError: disk on fire"):
+        tool("test.vcf")
+    failed = [r for r in caplog.records if "failed broken" in r.getMessage()]
+    assert failed and failed[0].levelname == "ERROR" and failed[0].exc_info is not None
+
+
 def test_wrapper_keeps_name_and_docstring():
     tool = server.only_allowed_folder(server.bam_stats)
     assert tool.__name__ == "bam_stats"
