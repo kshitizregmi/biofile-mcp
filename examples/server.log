@@ -1,0 +1,36 @@
+2026-11-07 04:02:14,358 INFO biofile: starting biofile server; allowed folder: test_data
+2026-11-07 04:02:14,385 INFO biofile: call vcf_stats path=test.vcf args={}
+2026-11-07 04:02:14,387 INFO biofile: done vcf_stats in 0.00s
+2026-11-07 04:02:14,389 INFO biofile: call bam_stats path=test.bam args={'region': None}
+2026-11-07 04:02:14,390 INFO biofile: done bam_stats in 0.00s
+2026-11-07 04:02:14,392 INFO biofile: call bam_stats path=test.bam args={'region': 'chr1:1001-1100'}
+2026-11-07 04:02:14,392 INFO biofile: done bam_stats in 0.00s
+2026-11-07 04:02:14,394 INFO biofile: call h5ad_summary path=small.h5ad args={'column': 'cell_type'}
+2026-11-07 04:02:14,403 INFO biofile: done h5ad_summary in 0.01s
+2026-11-07 04:02:14,405 INFO biofile: call fastq_stats path=sample_R1.fastq args={'max_reads': None}
+2026-11-07 04:02:14,417 INFO biofile: done fastq_stats in 0.01s
+2026-11-07 04:02:14,419 INFO biofile: call fastq_stats path=sample_R1.fastq args={'max_reads': 100}
+2026-11-07 04:02:14,421 INFO biofile: done fastq_stats in 0.00s
+2026-11-07 04:02:14,423 INFO biofile: call vcf_stats path=/etc/passwd args={}
+2026-11-07 04:02:14,423 WARNING biofile: refused vcf_stats: /etc/passwd is outside the allowed folder test_data
+2026-11-07 04:02:14,423 INFO mcp.server.mcpserver.server: Tool 'vcf_stats' failed: 'Error executing tool vcf_stats: /etc/passwd is outside the allowed folder test_data'
+2026-11-07 04:02:14,425 INFO biofile: call bam_stats path=test.bam args={'region': '1:1001-1100'}
+2026-11-07 04:02:14,425 ERROR biofile: failed bam_stats after 0.00s
+Traceback (most recent call last):
+  File "./server.py", line 101, in wrapper
+    result = fn(str(full), *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "./biofile/bam.py", line 84, in bam_stats
+    raise ValueError(
+ValueError: Contig '1' is not in the BAM header. Contigs in this file: ['chr1']
+2026-11-07 04:02:14,426 INFO mcp.server.mcpserver.server: Tool 'bam_stats' failed: "Error executing tool bam_stats: ValueError: Contig '1' is not in the BAM header. Contigs in this file: ['chr1']"
+2026-11-07 04:02:14,427 INFO biofile: call h5ad_summary path=small.h5ad args={'column': 'louvain'}
+2026-11-07 04:02:14,434 ERROR biofile: failed h5ad_summary after 0.01s
+Traceback (most recent call last):
+  File "./server.py", line 101, in wrapper
+    result = fn(str(full), *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "./biofile/h5ad.py", line 81, in h5ad_summary
+    raise ValueError(
+ValueError: Column 'louvain' not found. Available: ['cell_type']
+2026-11-07 04:02:14,434 INFO mcp.server.mcpserver.server: Tool 'h5ad_summary' failed: "Error executing tool h5ad_summary: ValueError: Column 'louvain' not found. Available: ['cell_type']"
