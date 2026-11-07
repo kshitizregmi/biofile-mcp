@@ -1,0 +1,11 @@
+{
+  "file": "test_data/test.bam",
+  "total_reads": 25,
+  "mapped_reads": 23,
+  "mapped_pct": 92.0,
+  "duplicates": 3,
+  "region": "chr1:1001-1100",
+  "reads_in_region": 20,
+  "pct_bases_covered": 50.0,
+  "mean_depth": 10.0
+}

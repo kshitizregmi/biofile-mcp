@@ -1,0 +1,27 @@
+{
+  "file": "test_data/sample_R1.fastq",
+  "reads": 100,
+  "sampled": true,
+  "total_bases": 24554,
+  "min_len": 240,
+  "avg_len": 245.5,
+  "max_len": 251,
+  "mean_base_quality": 31.9,
+  "q20_pct": 85.59,
+  "q30_pct": 71.49,
+  "gc_pct": 50.04,
+  "n_bases": 2,
+  "lowercase_bases": 4,
+  "other_characters": 0,
+  "base_counts": {
+    "A": 6079,
+    "G": 6105,
+    "T": 6183,
+    "C": 6181,
+    "N": 2,
+    "a": 1,
+    "c": 1,
+    "g": 1,
+    "t": 1
+  }
+}

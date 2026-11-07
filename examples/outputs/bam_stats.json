@@ -1,0 +1,7 @@
+{
+  "file": "test_data/test.bam",
+  "total_reads": 25,
+  "mapped_reads": 23,
+  "mapped_pct": 92.0,
+  "duplicates": 3
+}

@@ -1,0 +1,15 @@
+{
+  "file": "test_data/test.vcf",
+  "samples": 2,
+  "records": 5,
+  "no-ALTs": 0,
+  "SNPs": 3,
+  "MNPs": 0,
+  "indels": 2,
+  "others": 0,
+  "multiallelic sites": 0,
+  "multiallelic SNP sites": 0,
+  "ts": 2,
+  "tv": 1,
+  "ts_tv": 2.0
+}

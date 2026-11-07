@@ -1,0 +1,19 @@
+{
+  "file": "test_data/small.h5ad",
+  "n_cells": 200,
+  "n_genes": 100,
+  "cell_columns": [
+    "cell_type"
+  ],
+  "gene_columns": [],
+  "embeddings": [
+    "X_umap"
+  ],
+  "neighbor_graphs": [],
+  "X_looks_like": "raw counts",
+  "cells_per_cell_type": {
+    "T cell": 100,
+    "B cell": 60,
+    "NK cell": 40
+  }
+}
