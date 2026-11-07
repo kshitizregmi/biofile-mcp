@@ -1,0 +1,17 @@
+{
+  "name": "biofile-mcp",
+  "description": "Claude Code plugins for working with genomics files.",
+  "owner": {
+    "name": "Kshitiz Regmi",
+    "url": "https://github.com/kshitizregmi"
+  },
+  "plugins": [
+    {
+      "name": "biofile",
+      "source": ".",
+      "description": "Read-only summaries and QC of VCF, BAM, FASTQ and h5ad files.",
+      "category": "bioinformatics",
+      "tags": ["genomics", "vcf", "bam", "fastq", "h5ad", "qc"]
+    }
+  ]
+}
