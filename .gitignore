@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Test files created by make_test_data.py / setup.sh
+test_data/
+
+# pyfastx index files
+*.fxi
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
