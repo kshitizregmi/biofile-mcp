@@ -17,9 +17,13 @@ starts `server.py` over stdio, and calls each tool with an MCP client.
 | `vcf_stats(test.vcf)` | 5 records: 3 SNPs, 2 indels, Ts/Tv 2.0 |
 | `bam_stats(test.bam)` | 25 reads, 23 mapped (92%), 3 duplicates |
 | `bam_stats(test.bam, region="chr1:1001-1100")` | 20 reads (duplicates excluded), 50% of bases covered, mean depth 10 |
+| `bam_qc(test.bam)` | single-end, 0% error rate, every read at MAPQ 60; duplicates counted in coverage (23 reads over 50 bases) |
 | `h5ad_summary(small.h5ad, column="cell_type")` | 200 cells x 100 genes, raw counts; 100 T, 60 B, 40 NK cells |
+| `h5ad_column_stats(small.h5ad, column="cell_type")` | categorical: 100 / 60 / 40 cells |
 | `fastq_stats(sample_R1.fastq)` | 1,000 reads of 240-251 bp, 20 N bases, 40 lowercase bases |
 | `fastq_stats(sample_R1.fastq, max_reads=100)` | First 100 reads only, marked `"sampled": true` |
+| `fastq_quality_profile(sample_R1.fastq, max_points=26)` | Quality per position, pooled into 26 bins of 10 bp; median falls below Q30 in the bin starting at 171 |
+| `bam_depth_profile(test.bam, region="chr1:1001-1100", max_points=10)` | Depth 20× over 1001-1050 and 0× after, in 10 bins of 10 bp |
 
 ## Error handling
 
