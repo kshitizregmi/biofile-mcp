@@ -1,0 +1,11 @@
+{
+  "file": "test_data/small.h5ad",
+  "column": "cell_type",
+  "n_cells": 200,
+  "kind": "categorical",
+  "counts": {
+    "T cell": 100,
+    "B cell": 60,
+    "NK cell": 40
+  }
+}
