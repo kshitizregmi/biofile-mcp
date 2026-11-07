@@ -218,7 +218,36 @@ cannot read files on the server by path.
 
 ## Connect to an AI assistant
 
-### Claude Code
+### Claude Code plugin
+
+The quickest way. The plugin installs the server, its Python packages and a
+`genomics-qc` skill that tells Claude which tool to use for a question and how
+to judge the numbers (typical Q30, mapping rate, duplicate, Ts/Tv and
+single-cell QC ranges). You only need Python 3.10 or newer; no conda and no
+clone.
+
+```bash
+claude plugin marketplace add kshitizregmi/biofile-mcp@claude-plugin
+claude plugin install biofile@biofile-mcp --config data_dir=/full/path/to/your/data
+```
+
+The first session takes a few seconds longer while the Python packages install
+into Claude Code's plugin data folder. After that, ask questions as below, or
+run `/biofile:genomics-qc` with a file name for a full QC report. Change the
+data folder later with `/config`.
+
+Plugin files on this branch:
+
+| File | Purpose |
+|---|---|
+| `.claude-plugin/plugin.json` | plugin manifest: MCP server and the data-folder setting |
+| `.claude-plugin/marketplace.json` | lets this repository act as its own plugin marketplace |
+| `skills/genomics-qc/` | the QC skill and its reference table of typical ranges |
+| `hooks/hooks.json` | installs the Python packages when a session starts |
+| `scripts/install.sh`, `scripts/start-server.sh` | build the environment and start the server |
+| `requirements-server.txt` | packages the server needs (no web interface) |
+
+### Claude Code without the plugin
 
 The setup script creates or updates the conda environment, runs the tests and
 registers the server in one step:
@@ -294,6 +323,9 @@ biofile-mcp/
 ├── environment.yml       # conda environment
 ├── requirements.txt      # pip dependencies (requirements-dev.txt adds pytest)
 ├── setup.sh              # one-step setup for Claude Code
+├── .claude-plugin/       # Claude Code plugin manifest and marketplace
+├── skills/genomics-qc/   # QC skill shipped with the plugin
+├── hooks/, scripts/      # plugin install hook and server launcher
 └── .github/workflows/    # CI: runs the tests on Linux and macOS
 ```
 
