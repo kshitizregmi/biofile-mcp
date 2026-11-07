@@ -1,0 +1,14 @@
+name: biofile
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - pandas
+  - anndata
+  - pip
+  - pip:
+      - pysam
+      - pyfastx
+      - "mcp[cli]>=2"
