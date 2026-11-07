@@ -1,3 +1,4 @@
+"""Tests for :func:`biofile.fastq_stats`."""
 import pytest
 
 from biofile import fastq_stats

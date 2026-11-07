@@ -1,3 +1,4 @@
+"""Tests for :func:`biofile.h5ad_summary`."""
 import anndata as ad
 import numpy as np
 import pytest
@@ -19,7 +20,7 @@ def test_detects_raw_counts(data_dir):
 
 def test_detects_normalized_data(tmp_path):
     rng = np.random.default_rng(0)
-    adata = ad.AnnData(X=rng.normal(size=(50, 20)).astype(np.float32))  # scaled values, negatives
+    adata = ad.AnnData(X=rng.normal(size=(50, 20)).astype(np.float32))  # scaled data includes negatives
     path = tmp_path / "scaled.h5ad"
     adata.write_h5ad(path)
 

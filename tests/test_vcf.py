@@ -1,3 +1,4 @@
+"""Tests for :func:`biofile.vcf_stats`."""
 import pytest
 
 from biofile import vcf_stats

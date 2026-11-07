@@ -1,3 +1,4 @@
+"""Tests for :func:`biofile.bam_stats`."""
 import pytest
 from pysam.utils import SamtoolsError
 
@@ -15,7 +16,7 @@ def test_read_counts(data_dir):
 
 def test_region_coverage_skips_duplicates(data_dir):
     r = bam_stats(str(data_dir / "test.bam"), region="chr1:1001-1100")
-    assert r["reads_in_region"] == 20  # the 3 duplicates are not counted
+    assert r["reads_in_region"] == 20  # duplicates are excluded
     assert r["pct_bases_covered"] == 50.0
     assert r["mean_depth"] == 10.0
 
@@ -27,6 +28,6 @@ def test_region_with_no_reads(data_dir):
 
 
 def test_wrong_contig_name_raises(data_dir):
-    # BAM uses "chr1"; "1" is a common naming mismatch
+    # The BAM names the contig "chr1", not "1"
     with pytest.raises(SamtoolsError):
         bam_stats(str(data_dir / "test.bam"), region="1:1001-1100")
