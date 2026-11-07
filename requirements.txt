@@ -5,3 +5,5 @@ anndata
 numpy
 scipy
 pandas
+plotly
+streamlit
