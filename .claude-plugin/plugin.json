@@ -1,0 +1,31 @@
+{
+  "name": "biofile",
+  "displayName": "biofile",
+  "version": "0.1.0",
+  "description": "Read-only summaries and QC of VCF, BAM, FASTQ and h5ad files for Claude, computed locally with bcftools, samtools, pyfastx and anndata.",
+  "author": {
+    "name": "Kshitiz Regmi",
+    "url": "https://github.com/kshitizregmi"
+  },
+  "homepage": "https://github.com/kshitizregmi/biofile-mcp",
+  "repository": "https://github.com/kshitizregmi/biofile-mcp",
+  "license": "MIT",
+  "keywords": ["bioinformatics", "genomics", "vcf", "bam", "fastq", "h5ad", "single-cell", "qc", "mcp"],
+  "userConfig": {
+    "data_dir": {
+      "type": "directory",
+      "title": "Data folder",
+      "description": "Folder that holds your sequencing files. The biofile tools can read files inside this folder and nowhere else.",
+      "required": true
+    }
+  },
+  "mcpServers": {
+    "biofile": {
+      "command": "sh",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/start-server.sh"],
+      "env": {
+        "BIOFILE_ALLOWED_DIR": "${user_config.data_dir}"
+      }
+    }
+  }
+}
