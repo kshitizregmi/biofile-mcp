@@ -1,0 +1,7 @@
+mcp>=2
+pysam
+pyfastx
+anndata
+numpy
+scipy
+pandas
