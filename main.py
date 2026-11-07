@@ -1,7 +1,8 @@
 """Command-line interface to the biofile summaries.
 
-Picks the summary function from the file extension and prints the result as
-JSON. Useful for checking results directly, without an MCP client.
+Detects the file format (from the extension, or from the file's contents if
+the extension is unfamiliar) and prints the summary as JSON. Useful for
+checking results directly, without an MCP client.
 
 Examples::
 
@@ -13,10 +14,7 @@ Examples::
 import argparse
 import json
 
-from biofile import bam_stats, fastq_stats, h5ad_summary, vcf_stats
-
-VCF_SUFFIXES = (".vcf", ".vcf.gz", ".bcf")
-FASTQ_SUFFIXES = (".fastq", ".fq", ".fastq.gz", ".fq.gz")
+from biofile import bam_stats, detect_format, fastq_stats, h5ad_summary, vcf_stats
 
 
 def main() -> None:
@@ -27,18 +25,18 @@ def main() -> None:
     parser.add_argument("--max-reads", type=int, help="FASTQ only: stop after this many reads")
     args = parser.parse_args()
 
-    name = args.path.lower()
+    fmt = detect_format(args.path)
 
-    if name.endswith(VCF_SUFFIXES):
+    if fmt == "VCF":
         result = vcf_stats(args.path)
-    elif name.endswith(".bam"):
+    elif fmt == "BAM":
         result = bam_stats(args.path, region=args.region)
-    elif name.endswith(".h5ad"):
+    elif fmt == "h5ad":
         result = h5ad_summary(args.path, column=args.column)
-    elif name.endswith(FASTQ_SUFFIXES):
+    elif fmt == "FASTQ":
         result = fastq_stats(args.path, max_reads=args.max_reads)
     else:
-        parser.error(f"unsupported file type: {args.path}")
+        parser.error(f"not a recognized VCF, BAM, FASTQ or h5ad file: {args.path}")
 
     print(json.dumps(result, indent=2))
 
