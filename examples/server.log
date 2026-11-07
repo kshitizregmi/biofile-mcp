@@ -1,46 +1,30 @@
-2026-11-07 05:09:11,948 INFO biofile: starting biofile server; allowed folder: test_data
-2026-11-07 05:09:11,963 INFO biofile: call vcf_stats path=test.vcf args={}
-2026-11-07 05:09:11,965 INFO biofile: done vcf_stats in 0.00s
-2026-11-07 05:09:11,967 INFO biofile: call bam_stats path=test.bam args={'region': None}
-2026-11-07 05:09:11,967 INFO biofile: done bam_stats in 0.00s
-2026-11-07 05:09:11,969 INFO biofile: call bam_stats path=test.bam args={'region': 'chr1:1001-1100'}
-2026-11-07 05:09:11,969 INFO biofile: done bam_stats in 0.00s
-2026-11-07 05:09:11,970 INFO biofile: call bam_qc path=test.bam args={'region': None}
-2026-11-07 05:09:12,058 INFO biofile: done bam_qc in 0.09s
-2026-11-07 05:09:12,061 INFO biofile: call h5ad_summary path=small.h5ad args={'column': 'cell_type'}
-2026-11-07 05:09:12,085 INFO biofile: done h5ad_summary in 0.02s
-2026-11-07 05:09:12,087 INFO biofile: call h5ad_column_stats path=small.h5ad args={'column': 'cell_type', 'bins': 40}
-2026-11-07 05:09:12,094 INFO biofile: done h5ad_column_stats in 0.01s
-2026-11-07 05:09:12,096 INFO biofile: call fastq_stats path=sample_R1.fastq args={'max_reads': None}
-2026-11-07 05:09:12,116 INFO biofile: done fastq_stats in 0.02s
-2026-11-07 05:09:12,119 INFO biofile: call fastq_stats path=sample_R1.fastq args={'max_reads': 100}
-2026-11-07 05:09:12,121 INFO biofile: done fastq_stats in 0.00s
-2026-11-07 05:09:12,123 INFO biofile: call fastq_quality_profile path=sample_R1.fastq args={'max_reads': 100000, 'max_points': 26}
-2026-11-07 05:09:12,151 INFO biofile: done fastq_quality_profile in 0.03s
-2026-11-07 05:09:12,154 INFO biofile: call bam_depth_profile path=test.bam args={'region': 'chr1:1001-1100', 'min_depth': 20, 'max_points': 10}
-2026-11-07 05:09:12,155 INFO biofile: done bam_depth_profile in 0.00s
-2026-11-07 05:09:12,157 INFO biofile: call vcf_stats path=/etc/passwd args={}
-2026-11-07 05:09:12,157 WARNING biofile: refused vcf_stats: /etc/passwd is outside the allowed folder test_data
-2026-11-07 05:09:12,157 INFO mcp.server.mcpserver.server: Tool 'vcf_stats' failed: 'Error executing tool vcf_stats: /etc/passwd is outside the allowed folder test_data'
-2026-11-07 05:09:12,159 INFO biofile: call bam_stats path=test.bam args={'region': '1:1001-1100'}
-2026-11-07 05:09:12,159 ERROR biofile: failed bam_stats after 0.00s
-Traceback (most recent call last):
-  File "./server.py", line 110, in wrapper
-    result = fn(str(full), *args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "./biofile/bam.py", line 93, in bam_stats
-    _require_contig(_region_contig(region, contigs), contigs)
-  File "./biofile/bam.py", line 36, in _require_contig
-    raise ValueError(
-ValueError: Contig '1' is not in the BAM header. Contigs in this file: ['chr1']
-2026-11-07 05:09:12,160 INFO mcp.server.mcpserver.server: Tool 'bam_stats' failed: "Error executing tool bam_stats: ValueError: Contig '1' is not in the BAM header. Contigs in this file: ['chr1']"
-2026-11-07 05:09:12,161 INFO biofile: call h5ad_summary path=small.h5ad args={'column': 'louvain'}
-2026-11-07 05:09:12,170 ERROR biofile: failed h5ad_summary after 0.01s
-Traceback (most recent call last):
-  File "./server.py", line 110, in wrapper
-    result = fn(str(full), *args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "./biofile/h5ad.py", line 82, in h5ad_summary
-    raise ValueError(
-ValueError: Column 'louvain' not found. Available: ['cell_type']
-2026-11-07 05:09:12,171 INFO mcp.server.mcpserver.server: Tool 'h5ad_summary' failed: "Error executing tool h5ad_summary: ValueError: Column 'louvain' not found. Available: ['cell_type']"
+2026-11-07 15:59:01,572 INFO biofile: starting biofile server; allowed folder: test_data
+2026-11-07 15:59:01,587 INFO biofile: call vcf_stats path=test.vcf args={}
+2026-11-07 15:59:01,588 INFO biofile: done vcf_stats in 0.00s
+2026-11-07 15:59:01,590 INFO biofile: call bam_stats path=test.bam args={'region': None}
+2026-11-07 15:59:01,591 INFO biofile: done bam_stats in 0.00s
+2026-11-07 15:59:01,593 INFO biofile: call bam_stats path=test.bam args={'region': 'chr1:1001-1100'}
+2026-11-07 15:59:01,594 INFO biofile: done bam_stats in 0.00s
+2026-11-07 15:59:01,595 INFO biofile: call bam_qc path=test.bam args={'region': None}
+2026-11-07 15:59:01,655 INFO biofile: done bam_qc in 0.06s
+2026-11-07 15:59:01,658 INFO biofile: call h5ad_summary path=small.h5ad args={'column': 'cell_type'}
+2026-11-07 15:59:01,677 INFO biofile: done h5ad_summary in 0.02s
+2026-11-07 15:59:01,680 INFO biofile: call h5ad_column_stats path=small.h5ad args={'column': 'cell_type', 'bins': 40}
+2026-11-07 15:59:01,687 INFO biofile: done h5ad_column_stats in 0.01s
+2026-11-07 15:59:01,690 INFO biofile: call fastq_stats path=sample_R1.fastq args={'max_reads': None}
+2026-11-07 15:59:01,702 INFO biofile: done fastq_stats in 0.01s
+2026-11-07 15:59:01,706 INFO biofile: call fastq_stats path=sample_R1.fastq args={'max_reads': 100}
+2026-11-07 15:59:01,707 INFO biofile: done fastq_stats in 0.00s
+2026-11-07 15:59:01,710 INFO biofile: call fastq_quality_profile path=sample_R1.fastq args={'max_reads': 100000, 'max_points': 26}
+2026-11-07 15:59:01,730 INFO biofile: done fastq_quality_profile in 0.02s
+2026-11-07 15:59:01,732 INFO biofile: call bam_depth_profile path=test.bam args={'region': 'chr1:1001-1100', 'min_depth': 20, 'max_points': 10}
+2026-11-07 15:59:01,733 INFO biofile: done bam_depth_profile in 0.00s
+2026-11-07 15:59:01,735 INFO biofile: call vcf_stats path=/etc/passwd args={}
+2026-11-07 15:59:01,735 WARNING biofile: refused vcf_stats: /etc/passwd is outside the allowed folder test_data
+2026-11-07 15:59:01,735 INFO mcp.server.mcpserver.server: Tool 'vcf_stats' failed: 'Error executing tool vcf_stats: /etc/passwd is outside the allowed folder test_data'
+2026-11-07 15:59:01,737 INFO biofile: call bam_stats path=test.bam args={'region': '1:1001-1100'}
+2026-11-07 15:59:01,737 WARNING biofile: rejected bam_stats after 0.00s: Contig '1' is not in the BAM header. Contigs in this file: ['chr1']
+2026-11-07 15:59:01,737 INFO mcp.server.mcpserver.server: Tool 'bam_stats' failed: "Error executing tool bam_stats: ValueError: Contig '1' is not in the BAM header. Contigs in this file: ['chr1']"
+2026-11-07 15:59:01,739 INFO biofile: call h5ad_summary path=small.h5ad args={'column': 'louvain'}
+2026-11-07 15:59:01,747 WARNING biofile: rejected h5ad_summary after 0.01s: Column 'louvain' not found. Available: ['cell_type']
+2026-11-07 15:59:01,747 INFO mcp.server.mcpserver.server: Tool 'h5ad_summary' failed: "Error executing tool h5ad_summary: ValueError: Column 'louvain' not found. Available: ['cell_type']"
