@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# One-step setup for biofile-mcp:
+# Set up biofile-mcp in one step:
 #   1. create (or update) the "biofile" conda environment
 #   2. make test files and run the test suite
 #   3. connect the server to Claude Code
 #
 # Usage:
-#   bash setup.sh                      # Claude may read files in ./test_data
-#   bash setup.sh /path/to/your/data   # Claude may read files in that folder
+#   bash setup.sh                      # server may read ./test_data
+#   bash setup.sh /path/to/your/data   # server may read that folder
 
 set -euo pipefail
 
@@ -16,7 +16,7 @@ DATA_DIR="${1:-$PROJECT_DIR/test_data}"
 
 cd "$PROJECT_DIR"
 
-# ---- 1. Find conda -------------------------------------------------------
+# 1. Find conda
 if ! command -v conda >/dev/null 2>&1; then
     for base in "$HOME/miniconda3" "$HOME/miniconda" "$HOME/anaconda3" "$HOME/miniforge3"; do
         if [[ -f "$base/etc/profile.d/conda.sh" ]]; then
@@ -28,7 +28,7 @@ fi
 command -v conda >/dev/null 2>&1 || { echo "ERROR: conda not found. Install miniconda first."; exit 1; }
 source "$(conda info --base)/etc/profile.d/conda.sh"
 
-# ---- 2. Create or update the environment ---------------------------------
+# 2. Create or update the environment
 if conda env list | awk '{print $1}' | grep -qx "$ENV_NAME"; then
     echo ">> Updating conda env '$ENV_NAME'"
     conda env update -n "$ENV_NAME" -f environment.yml --prune
@@ -41,7 +41,7 @@ conda activate "$ENV_NAME"
 ENV_PYTHON="$(command -v python)"
 echo ">> Using Python: $ENV_PYTHON"
 
-# ---- 3. Test the functions -----------------------------------------------
+# 3. Run the tests
 echo ">> Making test files"
 python make_test_data.py
 
@@ -49,7 +49,7 @@ echo ">> Running the test suite"
 python -m pytest -q
 echo "   all tests passed"
 
-# ---- 4. Connect to Claude Code -------------------------------------------
+# 4. Register the server with Claude Code
 mkdir -p "$DATA_DIR"
 DATA_DIR="$(cd "$DATA_DIR" && pwd)"
 
