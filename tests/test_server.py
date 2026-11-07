@@ -1,5 +1,9 @@
-"""Tests for the MCP layer: folder safety, error messages, logging, and a real
-client talking to server.py over stdio (the same way Claude does)."""
+"""Tests for the MCP server layer.
+
+Covers path checks, error reporting and logging in the tool wrapper, plus an
+end-to-end test that starts ``server.py`` as a subprocess and talks to it over
+stdio with the MCP client library.
+"""
 import asyncio
 import json
 import logging
@@ -23,7 +27,7 @@ def allowed(data_dir, monkeypatch):
     return data_dir.resolve()
 
 
-# ---- path safety ------------------------------------------------------------
+# Path checks
 
 def test_relative_path_resolves_inside_allowed_folder(allowed):
     assert server.resolve_path("test.vcf") == allowed / "test.vcf"
@@ -44,7 +48,7 @@ def test_missing_file_is_reported(allowed):
         server.resolve_path("nope.vcf")
 
 
-# ---- wrapper: errors and logging --------------------------------------------
+# Error reporting and logging
 
 def test_python_errors_become_readable_tool_errors(allowed):
     tool = server.only_allowed_folder(server.h5ad_summary)
@@ -74,7 +78,7 @@ def test_wrapper_keeps_name_and_docstring():
     assert tool.__doc__ == server.bam_stats.__doc__
 
 
-# ---- end to end: a real MCP client over stdio -------------------------------
+# End to end over stdio
 
 def run_client(data_dir: Path, log_file: Path, calls: list[tuple[str, dict]]):
     params = StdioServerParameters(
@@ -107,7 +111,7 @@ def test_mcp_client_end_to_end(data_dir, tmp_path):
         ],
     )
 
-    # all four tools are listed, marked read-only, with their docstrings
+    # All four tools are listed, read-only, and carry their docstrings
     assert sorted(t.name for t in tools) == ["bam_stats", "fastq_stats", "h5ad_summary", "vcf_stats"]
     assert all(t.annotations.read_only_hint for t in tools)
     assert all(t.description for t in tools)
@@ -120,7 +124,8 @@ def test_mcp_client_end_to_end(data_dir, tmp_path):
     assert refused.is_error
     assert "outside the allowed folder" in refused.content[0].text
 
-    # logs went to the log file (and stderr), not stdout, so the protocol still worked
+    # If logs had gone to stdout the session above would have failed;
+    # check they reached the log file instead
     log_text = log_file.read_text()
     assert "starting biofile server" in log_text
     assert "done vcf_stats" in log_text
