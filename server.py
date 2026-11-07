@@ -1,18 +1,22 @@
-"""biofile MCP server.
+"""MCP server exposing the biofile summaries as read-only tools.
 
-Exposes the functions in the biofile package as MCP tools. Claude reads each
-function's name, type hints and docstring to decide when to call it and with
-which arguments, so this file contains no text-to-command logic.
+Each function in the ``biofile`` package is registered as a tool. MCP clients
+discover the tools at startup and receive each function's name, parameters and
+docstring as the tool's schema and description.
 
-Run:  python server.py
+Usage::
 
-Settings (environment variables):
-    BIOFILE_ALLOWED_DIR  only files inside this folder can be read (default: current folder)
-    BIOFILE_LOG_LEVEL    DEBUG, INFO (default), WARNING or ERROR
-    BIOFILE_LOG_FILE     also write logs to this file
+    python server.py
 
-Logs go to stderr, never stdout: over stdio, stdout carries the MCP messages
-themselves, and any extra output there would break the connection.
+Environment variables:
+
+``BIOFILE_ALLOWED_DIR``
+    Folder the tools may read from. Relative paths are resolved against it and
+    paths outside it are refused. Defaults to the current working directory.
+``BIOFILE_LOG_LEVEL``
+    ``DEBUG``, ``INFO`` (default), ``WARNING`` or ``ERROR``.
+``BIOFILE_LOG_FILE``
+    Optional path of a file to write logs to, in addition to stderr.
 """
 import logging
 import os
@@ -21,7 +25,7 @@ import time
 from functools import wraps
 from pathlib import Path
 
-from mcp.server.mcpserver import MCPServer  # MCP Python SDK v2 (was FastMCP in v1)
+from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
@@ -29,21 +33,39 @@ from biofile import bam_stats, fastq_stats, h5ad_summary, vcf_stats
 
 ALLOWED_DIR = Path(os.environ.get("BIOFILE_ALLOWED_DIR", Path.cwd())).expanduser().resolve()
 
-# ---- Logging ---------------------------------------------------------------
-handlers = [logging.StreamHandler(sys.stderr)]
+# Logs go to stderr only. With the stdio transport, stdout carries the MCP
+# messages, and anything else printed there would corrupt the connection.
+_handlers = [logging.StreamHandler(sys.stderr)]
 if os.environ.get("BIOFILE_LOG_FILE"):
-    handlers.append(logging.FileHandler(os.environ["BIOFILE_LOG_FILE"]))
+    _handlers.append(logging.FileHandler(os.environ["BIOFILE_LOG_FILE"]))
 
 logging.basicConfig(
     level=os.environ.get("BIOFILE_LOG_LEVEL", "INFO").upper(),
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    handlers=handlers,
+    handlers=_handlers,
 )
 log = logging.getLogger("biofile")
 
 
 def resolve_path(path: str) -> Path:
-    """Turn a user/model-supplied path into an absolute path inside ALLOWED_DIR."""
+    """Resolve a requested path and confirm it is a readable location.
+
+    Parameters
+    ----------
+    path : str
+        Absolute path, or a path relative to ``ALLOWED_DIR``. ``~`` is expanded.
+
+    Returns
+    -------
+    pathlib.Path
+        The absolute, symlink-resolved path.
+
+    Raises
+    ------
+    ToolError
+        If the resolved path is outside ``ALLOWED_DIR`` (including via ``..``
+        or symlinks), or if it does not exist.
+    """
     full = Path(path).expanduser()
     if not full.is_absolute():
         full = ALLOWED_DIR / full
@@ -57,9 +79,19 @@ def resolve_path(path: str) -> Path:
 
 
 def only_allowed_folder(fn):
-    """Check the `path` argument, log the call, and pass errors back to Claude."""
+    """Wrap a biofile function for use as an MCP tool.
 
-    @wraps(fn)  # keeps the original name, docstring and arguments for Claude
+    The wrapper resolves and checks the ``path`` argument with
+    :func:`resolve_path`, logs each call with its duration and outcome, and
+    converts any exception into a :class:`ToolError`. MCP servers hide the text
+    of other exceptions from the client, so this conversion is what lets the
+    caller see the actual reason for a failure and correct its request.
+
+    The wrapped function keeps the original name, signature and docstring,
+    which become the tool's name, input schema and description.
+    """
+
+    @wraps(fn)
     def wrapper(path: str, *args, **kwargs):
         start = time.perf_counter()
         log.info("call %s path=%s args=%s", fn.__name__, path, kwargs)
@@ -72,8 +104,6 @@ def only_allowed_folder(fn):
             raise
         except Exception as e:
             log.exception("failed %s after %.2fs", fn.__name__, time.perf_counter() - start)
-            # MCP v2 hides normal Python errors from Claude. ToolError passes the
-            # message through, so Claude can see what went wrong and fix its call.
             raise ToolError(f"{type(e).__name__}: {e}") from e
 
         log.info("done %s in %.2fs", fn.__name__, time.perf_counter() - start)
@@ -84,7 +114,7 @@ def only_allowed_folder(fn):
 
 mcp = MCPServer("biofile")
 
-# readOnlyHint tells the client these tools never change anything
+# Mark every tool read-only so clients know a call never changes anything
 read_only = ToolAnnotations(readOnlyHint=True)
 
 TOOLS = [vcf_stats, bam_stats, h5ad_summary, fastq_stats]
@@ -94,4 +124,4 @@ for tool in TOOLS:
 
 if __name__ == "__main__":
     log.info("starting biofile server; allowed folder: %s", ALLOWED_DIR)
-    mcp.run()  # talks to Claude over stdin/stdout
+    mcp.run()
