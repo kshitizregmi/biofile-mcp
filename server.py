@@ -92,7 +92,9 @@ def only_allowed_folder(fn):
 
     The wrapper resolves and checks the ``path`` argument with
     :func:`resolve_path`, logs each call with its duration and outcome, and
-    converts any exception into a :class:`ToolError`. MCP servers hide the text
+    converts any exception into a :class:`ToolError`. Invalid arguments
+    (``ValueError``) are logged as a one-line warning; any other exception is
+    logged with its full traceback. MCP servers hide the text
     of other exceptions from the client, so this conversion is what lets the
     caller see the actual reason for a failure and correct its request.
 
@@ -111,6 +113,11 @@ def only_allowed_folder(fn):
         except ToolError as e:
             log.warning("refused %s: %s", fn.__name__, e)
             raise
+        except ValueError as e:
+            # A bad argument, such as a contig or column that is not in the
+            # file. The message says what to fix, so a traceback adds nothing.
+            log.warning("rejected %s after %.2fs: %s", fn.__name__, time.perf_counter() - start, e)
+            raise ToolError(f"ValueError: {e}") from e
         except Exception as e:
             log.exception("failed %s after %.2fs", fn.__name__, time.perf_counter() - start)
             raise ToolError(f"{type(e).__name__}: {e}") from e
