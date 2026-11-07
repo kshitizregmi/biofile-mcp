@@ -1,9 +1,12 @@
-"""Create small test files with known answers.
+"""Generate small genomics files with known contents for testing.
+
+Usage::
 
     python make_test_data.py            # writes to ./test_data
     python make_test_data.py some/dir   # writes to some/dir
 
-The tests call make_test_data() to build the same files in a temporary folder.
+The test suite calls :func:`make_test_data` to build the same files in a
+temporary folder.
 """
 import random
 import sys
@@ -17,6 +20,33 @@ from pysam import samtools
 
 
 def make_test_data(out_dir: str | Path = "test_data") -> Path:
+    """Write a set of small test files whose summary values are known in advance.
+
+    Parameters
+    ----------
+    out_dir : str or pathlib.Path, default "test_data"
+        Destination folder. Created if it does not exist; existing files with
+        the same names are overwritten.
+
+    Returns
+    -------
+    pathlib.Path
+        The destination folder, containing:
+
+        ``test.vcf``
+            2 samples, 5 records: 3 SNPs (2 transitions, 1 transversion, so
+            Ts/Tv = 2.0) and 2 indels.
+        ``test.bam``, ``test.bam.bai``
+            25 reads: 20 mapped, 3 mapped duplicates and 2 unmapped
+            (92% mapped). Over ``chr1:1001-1100``: 20 non-duplicate reads,
+            50% of bases covered, mean depth 10.
+        ``sample_R1.fastq``
+            1,000 reads of 240-251 bp with 20 ``N`` bases and 40 lowercase
+            bases. Quality drops in the last 30% of each read.
+        ``small.h5ad``
+            200 cells x 100 genes of raw counts, with ``obs["cell_type"]``
+            holding 100 T cells, 60 B cells and 40 NK cells.
+    """
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -34,7 +64,8 @@ def make_test_data(out_dir: str | Path = "test_data") -> Path:
         "chr1\t5000\t.\tC\tCAG\t70\tPASS\t.\tGT\t1/1\t0/0\n"
     )
 
-    # BAM: 20 normal reads, 3 duplicates, 2 unmapped
+    # BAM: 20 normal reads, 3 duplicates (flag 1024) and 2 unmapped reads (flag 4).
+    # Written as SAM text, then sorted and indexed with samtools.
     seq, qual = "A" * 50, "I" * 50
     sam = ["@HD\tVN:1.6\tSO:unsorted", "@SQ\tSN:chr1\tLN:248956422", "@RG\tID:rg1\tSM:TUMOR"]
     sam += [f"read{i}\t0\tchr1\t1001\t60\t50M\t*\t0\t0\t{seq}\t{qual}\tRG:Z:rg1" for i in range(20)]
@@ -45,7 +76,8 @@ def make_test_data(out_dir: str | Path = "test_data") -> Path:
     samtools.index(str(out / "test.bam"))
     (out / "test.sam").unlink()
 
-    # FASTQ: 1000 reads, N in every 50th read, 4 lowercase bases in every 100th read
+    # FASTQ: an N in every 50th read and "acgt" in every 100th read.
+    # A fixed seed keeps the file identical on every run.
     rnd = random.Random(1)
     with open(out / "sample_R1.fastq", "w") as f:
         for i in range(1000):
@@ -58,7 +90,7 @@ def make_test_data(out_dir: str | Path = "test_data") -> Path:
             q = "".join(chr(33 + (37 if j < L * 0.7 else rnd.randint(10, 30))) for j in range(L))
             f.write(f"@read{i}\n{s}\n+\n{q}\n")
 
-    # h5ad: 200 cells x 100 genes, raw counts, 3 cell types (100/60/40)
+    # h5ad: Poisson counts, so X holds whole numbers like real raw counts
     rng = np.random.default_rng(0)
     counts = sp.csr_matrix(rng.poisson(1.0, size=(200, 100)).astype(np.float32))
     obs = pd.DataFrame(
