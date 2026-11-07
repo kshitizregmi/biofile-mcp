@@ -26,6 +26,22 @@ with no AI involved.
 See [`examples/`](examples/) for real output: the JSON each tool returns, a full
 MCP session transcript and the matching server log.
 
+## Guides
+
+One page per file type explains what the file is and what it contains, which
+files each tool needs, what every field of the output means, and how to read
+each chart, all shown on real public data:
+
+| Guide | Covers | Input files |
+|---|---|---|
+| [FASTQ](docs/fastq.md) | `fastq_stats`, `fastq_quality_profile` | one `.fastq` / `.fastq.gz`; run R1 and R2 separately |
+| [BAM](docs/bam.md) | `bam_stats`, `bam_qc`, `bam_depth_profile` | `.bam`, plus its `.bai` index for regions and depth profiles |
+| [VCF](docs/vcf.md) | `vcf_stats` | one `.vcf`, `.vcf.gz` or `.bcf`; no index needed |
+| [h5ad](docs/h5ad.md) | `h5ad_summary`, `h5ad_column_stats` | one `.h5ad` |
+
+Start at the [guide overview](docs/README.md) for how the formats fit together
+and a short glossary.
+
 ## Getting started
 
 Works on Linux and macOS. On Windows, use WSL (pysam does not support Windows).
@@ -92,10 +108,10 @@ cd ..
 
 | File | What to look at |
 |---|---|
-| `1_S103_L001_R1_001.fastq.gz` | 2,500 16S reads of 35-250 bp, 83.6% of bases at Q30 or better |
-| `test.paired_end.sorted.bam` | 5,644 reads, 99.96% mapped; use region `chr22` with target depth 10 |
-| `NA12878_GIAB.chr22.vcf.gz` | 81 variants (70 SNPs, 11 indels), Ts/Tv 2.89 |
-| `pbmc3k.h5ad` | 2,638 cells x 1,838 genes; count cells by `louvain` for 8 cell types |
+| `1_S103_L001_R1_001.fastq.gz` | 2,500 16S reads of 35-250 bp, 83.6% of bases at Q30 or better, 623 placeholder reads of all `N` ([walkthrough](docs/fastq.md)) |
+| `test.paired_end.sorted.bam` | 5,644 reads, 99.96% mapped; use region `chr22:1500-5000` with target depth 20 ([walkthrough](docs/bam.md)) |
+| `NA12878_GIAB.chr22.vcf.gz` | 81 variants (70 SNPs, 11 indels), Ts/Tv 2.89 ([walkthrough](docs/vcf.md)) |
+| `pbmc3k.h5ad` | 2,638 cells x 1,838 genes; count cells by `louvain` for 8 cell types ([walkthrough](docs/h5ad.md)) |
 
 `real_data/` is ignored by git.
 
@@ -198,6 +214,8 @@ Results are organised in tabs:
 | VCF | **Overview**: substitution spectrum, variants by type · **Quality & depth**: QUAL and genotype depth · **Indels**: lengths of insertions and deletions · **Samples**: genotype counts per sample |
 | h5ad | **Groups**: cells per category of any `obs` column · **QC metrics**: histograms of every numeric `obs` column · **Embedding**: UMAP/t-SNE with one group highlighted, or colored by a numeric column |
 
+Each guide shows every tab on real data and explains how to read it.
+
 ![FASTQ quality report](docs/screenshots/fastq.png)
 
 <details>
@@ -269,7 +287,11 @@ Every tool call is logged with its arguments, duration and outcome:
 2026-11-06 21:40:12,517 INFO biofile: call vcf_stats path=test.vcf args={}
 2026-11-06 21:40:12,548 INFO biofile: done vcf_stats in 0.03s
 2026-11-06 21:40:15,102 WARNING biofile: refused vcf_stats: /etc/passwd is outside the allowed folder ...
+2026-11-06 21:40:16,873 WARNING biofile: rejected bam_stats after 0.00s: Contig '1' is not in the BAM header ...
 ```
+
+Invalid arguments, such as a wrong contig or column name, are logged as a
+one-line warning. Unexpected errors are logged with a full traceback.
 
 Logs go to stderr (and the log file, if set), never to stdout, because over stdio
 stdout carries the MCP protocol messages.
@@ -290,7 +312,8 @@ biofile-mcp/
 ├── make_test_data.py     # small test files with known answers
 ├── tests/                # pytest suite, including a real MCP client test
 ├── examples/             # captured server output: results, session transcript, log
-├── docs/screenshots/     # screenshots of the web interface
+├── docs/                 # one guide per file format, with screenshots on real data
+│   └── make_screenshots.py   # rebuilds the guide screenshots from the web interface
 ├── environment.yml       # conda environment
 ├── requirements.txt      # pip dependencies (requirements-dev.txt adds pytest)
 ├── setup.sh              # one-step setup for Claude Code
