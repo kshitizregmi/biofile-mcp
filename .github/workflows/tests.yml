@@ -26,3 +26,6 @@ jobs:
 
       - name: Run tests
         run: python -m pytest -v
+
+      - name: Run tests on real public data
+        run: python -m pytest -m real_data -v
