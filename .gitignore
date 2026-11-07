@@ -5,8 +5,9 @@ __pycache__/
 .venv/
 venv/
 
-# Test files created by make_test_data.py / setup.sh
+# Test files created by make_test_data.py / setup.sh, and downloaded data
 test_data/
+real_data/
 
 # pyfastx index files
 *.fxi
