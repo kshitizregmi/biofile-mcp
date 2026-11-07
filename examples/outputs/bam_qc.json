@@ -1,0 +1,76 @@
+{
+  "file": "test_data/test.bam",
+  "region": null,
+  "summary": {
+    "reads": 25,
+    "mapped": 23,
+    "mapped_pct": 92.0,
+    "paired": 0,
+    "properly_paired_pct": 0.0,
+    "duplicates": 3,
+    "mq0": 0,
+    "secondary": 0,
+    "supplementary": 0,
+    "bases_mapped": 1150,
+    "mismatches": 0,
+    "error_rate": 0.0,
+    "avg_length": 50.0,
+    "max_length": 50,
+    "avg_quality": 40.0,
+    "insert_size_mean": 0.0,
+    "insert_size_sd": 0.0,
+    "inward_pairs": 0,
+    "outward_pairs": 0,
+    "pairs_on_different_contigs": 0
+  },
+  "mapq": {
+    "mapq": [
+      60
+    ],
+    "reads": [
+      20
+    ]
+  },
+  "insert_size": {
+    "start": [],
+    "end": [],
+    "count": []
+  },
+  "read_length": {
+    "start": [
+      50
+    ],
+    "end": [
+      50
+    ],
+    "count": [
+      25
+    ]
+  },
+  "coverage": {
+    "depth": [
+      23
+    ],
+    "bases": [
+      50
+    ],
+    "pct_bases_at_least": {
+      "1x": 100.0,
+      "5x": 100.0,
+      "10x": 100.0,
+      "20x": 100.0,
+      "30x": 0.0,
+      "50x": 0.0,
+      "100x": 0.0
+    }
+  },
+  "contigs": [
+    {
+      "contig": "chr1",
+      "length": 248956422,
+      "mapped": 23,
+      "unmapped": 0
+    }
+  ],
+  "unplaced_unmapped": 2
+}
