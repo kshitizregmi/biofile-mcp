@@ -1,4 +1,5 @@
 """FASTQ tools."""
+import os
 from collections import Counter
 
 import numpy as np
@@ -10,6 +11,9 @@ def fastq_stats(path: str, max_reads: int | None = None) -> dict:
     (min/avg/max), mean base quality, % bases >= Q20 and Q30, GC %, N count,
     lowercase count and per-base counts. If max_reads is set, only the first
     max_reads reads are checked (faster for big files)."""
+    if os.path.getsize(path) == 0:  # pyfastx can't open empty files
+        return {"file": path, "reads": 0, "warning": "file is empty"}
+
     reads = 0
     total_bases = 0
     min_len = None
