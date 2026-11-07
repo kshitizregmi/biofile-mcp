@@ -111,8 +111,9 @@ def test_mcp_client_end_to_end(data_dir, tmp_path):
         ],
     )
 
-    # All four tools are listed, read-only, and carry their docstrings
-    assert sorted(t.name for t in tools) == ["bam_stats", "fastq_stats", "h5ad_summary", "vcf_stats"]
+    # Every tool is listed, read-only, and carries its docstring
+    assert sorted(t.name for t in tools) == sorted(f.__name__ for f in server.TOOLS)
+    assert len(tools) == 8
     assert all(t.annotations.read_only_hint for t in tools)
     assert all(t.description for t in tools)
 
