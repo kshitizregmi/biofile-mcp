@@ -16,6 +16,9 @@ Files stay on your machine; the tools are read-only.
 | `h5ad_summary` | h5ad (+ optional column) | cells, genes, metadata, embeddings, raw-counts check, cells per category |
 | `fastq_stats` | FASTQ / FASTQ.gz | reads, lengths, Q20/Q30, GC, N, lowercase and per-base counts (via pyfastx) |
 
+See [`examples/`](examples/) for real output: the JSON each tool returns, a full
+MCP session transcript and the matching server log.
+
 ## Project layout
 
 ```
@@ -29,6 +32,7 @@ biofile-mcp/
 ├── main.py               # run the functions from the terminal, without MCP
 ├── make_test_data.py     # tiny test files with known answers
 ├── tests/                # pytest suite, including a real MCP client test
+├── examples/             # captured server output: results, session transcript, log
 ├── environment.yml       # conda environment
 ├── setup.sh              # one-step setup: env + tests + Claude Code
 └── .github/workflows/    # CI: runs the tests on Linux and macOS
