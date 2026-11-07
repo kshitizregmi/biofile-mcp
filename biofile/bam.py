@@ -1,7 +1,28 @@
 """Sequence alignment (BAM) summaries."""
 import json
+import re
 
+import pysam
 from pysam import samtools
+
+# How many contig names to show when a region names a contig that isn't there
+_CONTIGS_TO_SHOW = 10
+
+
+def _region_contig(region: str, contigs) -> str:
+    """Return the contig part of a samtools region string.
+
+    Follows samtools: if the whole string is a contig name in the header, it is
+    taken as the contig. Otherwise a trailing ``:start-end`` is removed.
+    """
+    # Some contig names (e.g. HLA alleles) contain colons themselves,
+    # so check the header before splitting
+    if region in contigs:
+        return region
+    contig, sep, span = region.rpartition(":")
+    if sep and re.fullmatch(r"[\d,]+(-[\d,]*)?", span):
+        return contig
+    return region
 
 
 def bam_stats(path: str, region: str | None = None) -> dict:
@@ -34,9 +55,13 @@ def bam_stats(path: str, region: str | None = None) -> dict:
 
     Raises
     ------
+    ValueError
+        If the region's contig is not in the BAM header. The message lists
+        contig names from the header, which helps spot ``chr1`` vs ``1``
+        naming mismatches.
     pysam.utils.SamtoolsError
         If the file is missing or invalid, the index is missing, or the region
-        cannot be parsed or does not exist in the BAM header.
+        cannot be parsed.
     """
     flagstat = json.loads(samtools.flagstat("-O", "json", path))
     counts = flagstat["QC-passed reads"]
@@ -50,6 +75,16 @@ def bam_stats(path: str, region: str | None = None) -> dict:
     }
 
     if region:
+        with pysam.AlignmentFile(path) as bam:
+            contigs = bam.references
+        contig = _region_contig(region, contigs)
+        if contig not in contigs:
+            shown = list(contigs[:_CONTIGS_TO_SHOW])
+            more = f" and {len(contigs) - len(shown)} more" if len(contigs) > len(shown) else ""
+            raise ValueError(
+                f"Contig '{contig}' is not in the BAM header. Contigs in this file: {shown}{more}"
+            )
+
         # samtools coverage prints a header row and one row of values
         table = samtools.coverage("-r", region, path).strip().splitlines()
         header = table[0].lstrip("#").split("\t")
