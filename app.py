@@ -53,14 +53,25 @@ def save_uploads(files) -> Path:
 
     Each file is written once; later reruns reuse the copy. Original names are
     kept because samtools finds a BAM's index by looking for ``<name>.bam.bai``.
+    Index files are given a newer modification time than their data files, so
+    htslib does not warn that the index is older than the file it indexes.
     """
     if "upload_dir" not in st.session_state:
         st.session_state.upload_dir = tempfile.mkdtemp(prefix="biofile_")
     folder = Path(st.session_state.upload_dir)
+    written = False
     for f in files:
         target = folder / f.name
         if not target.exists() or target.stat().st_size != f.size:
             target.write_bytes(f.getbuffer())
+            written = True
+
+    # Files are written in upload order, so an index can end up older than
+    # its BAM or VCF. Touch the indexes last to put them back in order.
+    if written:
+        for index in folder.iterdir():
+            if is_index(index.name):
+                index.touch()
     return folder
 
 
