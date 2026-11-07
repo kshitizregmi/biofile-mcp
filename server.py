@@ -29,7 +29,16 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
-from biofile import bam_stats, fastq_stats, h5ad_summary, vcf_stats
+from biofile import (
+    bam_depth_profile,
+    bam_qc,
+    bam_stats,
+    fastq_quality_profile,
+    fastq_stats,
+    h5ad_column_stats,
+    h5ad_summary,
+    vcf_stats,
+)
 
 ALLOWED_DIR = Path(os.environ.get("BIOFILE_ALLOWED_DIR", Path.cwd())).expanduser().resolve()
 
@@ -117,7 +126,18 @@ mcp = MCPServer("biofile")
 # Mark every tool read-only so clients know a call never changes anything
 read_only = ToolAnnotations(readOnlyHint=True)
 
-TOOLS = [vcf_stats, bam_stats, h5ad_summary, fastq_stats]
+# h5ad_embedding is left out on purpose: it returns thousands of coordinates,
+# which are useful for drawing but not for a language model
+TOOLS = [
+    vcf_stats,
+    bam_stats,
+    bam_qc,
+    bam_depth_profile,
+    h5ad_summary,
+    h5ad_column_stats,
+    fastq_stats,
+    fastq_quality_profile,
+]
 for tool in TOOLS:
     mcp.tool(annotations=read_only)(only_allowed_folder(tool))
 
